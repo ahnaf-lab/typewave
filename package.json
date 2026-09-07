@@ -1,0 +1,21 @@
+{
+  "name": "typewave",
+  "version": "0.1.0",
+  "description": "Deterministic typing/reveal animation frame generator for terminal demos.",
+  "type": "module",
+  "main": "src/engine.js",
+  "bin": {
+    "typewave": "./bin/typewave.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "license": "MIT"
+}
