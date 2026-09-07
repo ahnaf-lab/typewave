@@ -7,8 +7,8 @@ input always produces the exact same frames, so demo output is reproducible
 and diffable instead of a fresh recording every time.
 
 This is an early milestone: text turns into frames, and frames can now be
-rendered as an asciinema-compatible cast. Rendering as an animated SVG lands
-in a later milestone.
+rendered as an asciinema-compatible cast or as a self-contained animated SVG
+you can embed directly in a README.
 
 ## Install
 
@@ -32,12 +32,20 @@ typewave <input-file> [--profile <name>] [--format <name>]
 - `--profile, -p` — the timing profile to use: `steady` (constant delay
   between characters) or `natural` (seeded jitter plus longer pauses after
   punctuation and newlines). Defaults to `steady`.
-- `--format, -f` — the output format: `frames` (raw JSON frame list) or
-  `cast` (an asciinema v2 cast). Defaults to `frames`.
-- `--width`, `--height` — terminal size, in columns/rows, recorded in the
-  cast header. Only used with `--format cast`. Default: `80x24`.
-- `--title` — an optional title recorded in the cast header. Only used with
-  `--format cast`.
+- `--format, -f` — the output format: `frames` (raw JSON frame list), `cast`
+  (an asciinema v2 cast), or `svg` (a self-contained animated SVG). Defaults
+  to `frames`.
+- `--width`, `--height` — terminal size, in columns/rows. Used to size the
+  cast header or the SVG canvas. Only used with `--format cast` or
+  `--format svg`. Default: `80x24`.
+- `--title` — an optional title recorded in the cast header, or rendered as
+  an SVG `<title>` element. Only used with `--format cast` or `--format svg`.
+- `--font-size` — SVG font size in pixels. Only used with `--format svg`.
+  Default: `16`.
+- `--no-loop` — render the SVG animation to play once and hold on the final
+  frame, instead of looping forever. Only used with `--format svg`.
+- `--background`, `--foreground` — CSS colors for the SVG canvas and text.
+  Only used with `--format svg`. Default: a dark terminal-like theme.
 
 ### `frames` format
 
@@ -84,6 +92,28 @@ character, in seconds. The cast's `timestamp` is always `0`, and the times
 are derived directly from the same seeded frame timings as the `frames`
 format, so the same input and profile always produce a byte-for-byte
 identical cast.
+
+### `svg` format
+
+A single self-contained `.svg` file — markup plus a `<style>` block, no
+external references — that you can commit and embed straight into a README:
+
+```
+typewave README.md --format svg > demo.svg
+```
+
+```markdown
+![demo](demo.svg)
+```
+
+Every character in the input gets its own tiny CSS `@keyframes` rule that
+flips it from invisible to visible at the exact percentage of one animation
+cycle that its frame timing works out to, so the SVG "types" out in the
+browser with no JavaScript involved. By default the animation loops forever
+with a pause on the finished text; pass `--no-loop` to play once and hold.
+Because the percentages come from the same seeded frame timings as the
+`cast` format, the same input, profile and options always produce a
+byte-for-byte identical SVG.
 
 ## Status
 
