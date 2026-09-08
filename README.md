@@ -25,34 +25,45 @@ dependencies — but it wires up the `typewave` binary from `bin/typewave.js`.
 ## Usage
 
 ```
-typewave <input-file> [--profile <name>] [--format <name>]
+typewave render <input-file> [options]
 ```
 
+Run `typewave --help` for the list of commands, or `typewave render --help`
+for the full option list.
+
 - `<input-file>` — a plain text file, or the captured output of any command.
-- `--profile, -p` — the timing profile to use: `steady` (constant delay
+- `--speed, -s` — the timing profile to use: `steady` (constant delay
   between characters) or `natural` (seeded jitter plus longer pauses after
   punctuation and newlines). Defaults to `steady`.
-- `--format, -f` — the output format: `frames` (raw JSON frame list), `cast`
+- `--theme, -t` — a named color theme for `svg` output: `dark`, `light`,
+  `dracula`, or `solarized`. Defaults to `dark`. Ignored for `frames` and
+  `cast` output, which carry no color information of their own.
+- `--out, -o` — the output format: `frames` (raw JSON frame list), `cast`
   (an asciinema v2 cast), or `svg` (a self-contained animated SVG). Defaults
   to `frames`.
 - `--width`, `--height` — terminal size, in columns/rows. Used to size the
-  cast header or the SVG canvas. Only used with `--format cast` or
-  `--format svg`. Default: `80x24`.
+  cast header or the SVG canvas. Only used with `--out cast` or `--out svg`.
+  Default: `80x24`.
 - `--title` — an optional title recorded in the cast header, or rendered as
-  an SVG `<title>` element. Only used with `--format cast` or `--format svg`.
-- `--font-size` — SVG font size in pixels. Only used with `--format svg`.
+  an SVG `<title>` element. Only used with `--out cast` or `--out svg`.
+- `--font-size` — SVG font size in pixels. Only used with `--out svg`.
   Default: `16`.
 - `--no-loop` — render the SVG animation to play once and hold on the final
-  frame, instead of looping forever. Only used with `--format svg`.
-- `--background`, `--foreground` — CSS colors for the SVG canvas and text.
-  Only used with `--format svg`. Default: a dark terminal-like theme.
+  frame, instead of looping forever. Only used with `--out svg`.
+- `--background`, `--foreground` — CSS colors for the SVG canvas and text,
+  overriding whichever `--theme` is in effect. Only used with `--out svg`.
+- `--help, -h` — show help for the top-level CLI or for `render`.
+
+Every option value is validated up front — an unknown speed, theme, output
+format, or a non-positive `--width`/`--height`/`--font-size` fails with a
+specific error message instead of a confusing downstream crash.
 
 ### `frames` format
 
 A JSON array of frames on stdout, one per character:
 
 ```
-typewave README.md --profile natural
+typewave render README.md --speed natural
 ```
 
 ```json
@@ -76,7 +87,7 @@ a header line followed by one `[time, "o", data]` event line per write,
 playable with `asciinema play` or any compatible viewer/converter:
 
 ```
-typewave README.md --format cast > demo.cast
+typewave render README.md --out cast > demo.cast
 asciinema play demo.cast
 ```
 
@@ -99,7 +110,7 @@ A single self-contained `.svg` file — markup plus a `<style>` block, no
 external references — that you can commit and embed straight into a README:
 
 ```
-typewave README.md --format svg > demo.svg
+typewave render README.md --out svg --theme dracula > demo.svg
 ```
 
 ```markdown
