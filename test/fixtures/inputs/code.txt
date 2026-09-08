@@ -1,0 +1,2 @@
+$ npm test
+✓ 42 passing (1s)
